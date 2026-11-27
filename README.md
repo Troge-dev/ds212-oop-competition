@@ -2,7 +2,7 @@
 
 A zero-dependency Jupyter Notebook repository built for a **60-minute peer tutoring session** on **Object-Oriented Programming (DS212)** at the University of Science and Technology of Southern Philippines (USTP).
 
-Designed for computer labs without a projector: every student clones this repository onto their own PC and opens `00_quick_reviewer.ipynb` as an interactive screen guide before competing in their assigned group notebook.
+Designed for computer labs without a projector: every student clones this repository onto their own PC and opens `00_quick_reviewer.ipynb` (or the live slide deck at [https://troge-dev.github.io/ds212-oop-competition/](https://troge-dev.github.io/ds212-oop-competition/)) as an interactive screen guide before competing in their assigned group notebook.
 
 ---
 

@@ -1,0 +1,1502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DS212: Encapsulation, Inheritance, and Polymorphism | Keynote Deck</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg-canvas: #F8F6F1;
+      --bg-parchment: #F3EFE6;
+      --surface-card: #FFFFFF;
+      --surface-back: #F5EFE6;
+      --border-hairline: #DCD4C4;
+      --text-main: #1F1C18;
+      --text-muted: #574F44;
+      --text-subtle: #786E62;
+
+      --accent-crimson: #C84B31;
+      --accent-crimson-soft: #FDF1EE;
+      --accent-ochre: #A96E32;
+      --accent-ochre-soft: #FBF4EB;
+      --accent-teal: #26796B;
+      --accent-teal-soft: #EEF7F5;
+      --accent-navy: #1D5BB0;
+      --accent-navy-soft: #EEF4FC;
+
+      --font-display: 'Space Grotesk', system-ui, sans-serif;
+      --font-sans: 'Plus Jakarta Sans', system-ui, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      height: 100%;
+      background-color: var(--bg-canvas);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      overflow: hidden;
+    }
+
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    :where(button, a, [tabindex]):focus-visible {
+      outline: 3px solid var(--accent-navy);
+      outline-offset: 3px;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /* Edge-hover top header drawer */
+    .deck-header {
+      position: fixed;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%) translateY(-76%);
+      z-index: 40;
+      background-color: var(--surface-card);
+      border: 1px solid var(--border-hairline);
+      border-top: none;
+      border-radius: 0 0 10px 10px;
+      padding: 8px 18px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      opacity: 0.28;
+      box-shadow: 0 4px 16px rgba(31, 28, 24, 0.08);
+    }
+
+    .deck-header:hover,
+    .deck-header:focus-within,
+    .deck-header.pinned {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      .deck-header,
+      .deck-footer {
+        transition: transform 0.2s ease, opacity 0.2s ease;
+      }
+    }
+
+    .header-meta {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.6px;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    /* Edge-hover bottom footer controls */
+    .deck-footer {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%) translateY(72%);
+      z-index: 40;
+      background-color: var(--surface-card);
+      border: 1px solid var(--border-hairline);
+      border-bottom: none;
+      border-radius: 10px 10px 0 0;
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      opacity: 0.35;
+      box-shadow: 0 -4px 16px rgba(31, 28, 24, 0.08);
+    }
+
+    .deck-footer:hover,
+    .deck-footer:focus-within,
+    .deck-footer.pinned {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    .ctrl-btn {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 600;
+      min-width: 32px;
+      min-height: 28px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border-hairline);
+      background-color: var(--bg-parchment);
+      color: var(--text-main);
+      cursor: pointer;
+    }
+
+    .ctrl-btn:hover:not(:disabled) {
+      background-color: var(--surface-card);
+      border-color: var(--accent-navy);
+      color: var(--accent-navy);
+    }
+
+    .ctrl-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .slide-counter {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-main);
+      min-width: 62px;
+      text-align: center;
+    }
+
+    /* 16:9 Stage Container */
+    .keynote-stage {
+      width: min(1380px, calc(100vw - 2rem), calc((100vh - 2.5rem) * 16 / 9));
+      aspect-ratio: 16 / 9;
+      background-color: var(--surface-card);
+      border: 1px solid var(--border-hairline);
+      border-radius: 14px;
+      box-shadow: 0 12px 36px rgba(31, 28, 24, 0.07);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .progress-rail {
+      height: 4px;
+      width: 100%;
+      background-color: var(--bg-parchment);
+      flex-shrink: 0;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background-color: var(--accent-navy);
+      width: 8.33%;
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      .progress-fill {
+        transition: width 0.25s ease;
+      }
+    }
+
+    .slides-viewport {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      padding: 2.2rem 2.8rem;
+      display: none;
+      flex-direction: column;
+      justify-content: space-between;
+      background-color: var(--surface-card);
+      overflow-y: auto;
+    }
+
+    .slide.active {
+      display: flex;
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      .slide.active {
+        animation: slideIn 0.22s ease-out;
+      }
+      @keyframes slideIn {
+        from { opacity: 0; transform: translateY(8px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+    }
+
+    /* Slide Header & Typography */
+    .slide-top {
+      border-bottom: 1px solid var(--border-hairline);
+      padding-bottom: 0.85rem;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .kicker {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--accent-navy);
+      margin-bottom: 0.3rem;
+      display: block;
+    }
+
+    .kicker-crimson { color: var(--accent-crimson); }
+    .kicker-ochre { color: var(--accent-ochre); }
+    .kicker-teal { color: var(--accent-teal); }
+
+    h1.hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 3.6vw, 3.1rem);
+      font-weight: 700;
+      line-height: 1.12;
+      letter-spacing: -0.02em;
+      color: var(--text-main);
+    }
+
+    h2.slide-title {
+      font-family: var(--font-display);
+      font-size: clamp(1.35rem, 2.2vw, 1.95rem);
+      font-weight: 700;
+      line-height: 1.18;
+      letter-spacing: -0.015em;
+      color: var(--text-main);
+    }
+
+    .slide-tag {
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 6px;
+      background-color: var(--bg-parchment);
+      border: 1px solid var(--border-hairline);
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .lead-text {
+      font-size: clamp(0.95rem, 1.3vw, 1.12rem);
+      color: var(--text-muted);
+      line-height: 1.55;
+      max-width: 72ch;
+    }
+
+    .slide-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 1rem;
+    }
+
+    .slide-bottom {
+      margin-top: 0.85rem;
+      padding-top: 0.6rem;
+      border-top: 1px solid var(--border-hairline);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--text-subtle);
+    }
+
+    /* Grids & Cards */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1.1rem;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1rem;
+    }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.9rem;
+    }
+
+    .panel {
+      background-color: var(--bg-canvas);
+      border: 1px solid var(--border-hairline);
+      border-radius: 10px;
+      padding: 1rem 1.15rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+    }
+
+    .panel-white {
+      background-color: var(--surface-card);
+    }
+
+    .panel-crimson { border-top: 3px solid var(--accent-crimson); }
+    .panel-ochre { border-top: 3px solid var(--accent-ochre); }
+    .panel-teal { border-top: 3px solid var(--accent-teal); }
+    .panel-navy { border-top: 3px solid var(--accent-navy); }
+
+    .panel-title {
+      font-family: var(--font-display);
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .panel-kicker {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .c-crimson { color: var(--accent-crimson); }
+    .c-ochre { color: var(--accent-ochre); }
+    .c-teal { color: var(--accent-teal); }
+    .c-navy { color: var(--accent-navy); }
+
+    ul.clean-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.45;
+    }
+
+    ul.clean-list li {
+      padding-left: 1rem;
+      position: relative;
+    }
+
+    ul.clean-list li::before {
+      content: ">";
+      font-family: var(--font-mono);
+      font-weight: 700;
+      position: absolute;
+      left: 0;
+      color: var(--accent-navy);
+    }
+
+    code.inline {
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+      background-color: var(--bg-parchment);
+      padding: 1px 5px;
+      border-radius: 4px;
+      border: 1px solid var(--border-hairline);
+      color: var(--text-main);
+    }
+
+    pre.code-block {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.45;
+      background-color: var(--bg-parchment);
+      border: 1px solid var(--border-hairline);
+      border-radius: 8px;
+      padding: 0.8rem 0.95rem;
+      color: var(--text-main);
+      overflow-x: auto;
+      white-space: pre;
+    }
+
+    .kw { color: #854D0E; font-weight: 700; }
+    .fn { color: #1D5BB0; font-weight: 600; }
+    .str { color: #15803D; }
+    .cm { color: #786E62; font-style: italic; }
+
+    /* 3D Flip Cards */
+    .flip-card {
+      perspective: 1200px;
+      min-height: 250px;
+      cursor: pointer;
+      background: transparent;
+      border: none;
+      text-align: left;
+      padding: 0;
+      width: 100%;
+    }
+
+    .flip-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      min-height: 250px;
+      transform-style: preserve-3d;
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      .flip-inner {
+        transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+    }
+
+    .flip-card.is-flipped .flip-inner {
+      transform: rotateY(180deg);
+    }
+
+    .flip-face {
+      position: absolute;
+      inset: 0;
+      backface-visibility: hidden;
+      border-radius: 10px;
+      padding: 1.2rem;
+      border: 1px solid var(--border-hairline);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .flip-front {
+      background-color: var(--surface-card);
+    }
+
+    .flip-back {
+      background-color: var(--surface-back);
+      transform: rotateY(180deg);
+    }
+
+    .flip-crimson .flip-front { border-top: 4px solid var(--accent-crimson); }
+    .flip-crimson .flip-back { border-top: 4px solid var(--accent-crimson); background-color: var(--accent-crimson-soft); }
+
+    .flip-ochre .flip-front { border-top: 4px solid var(--accent-ochre); }
+    .flip-ochre .flip-back { border-top: 4px solid var(--accent-ochre); background-color: var(--accent-ochre-soft); }
+
+    .flip-teal .flip-front { border-top: 4px solid var(--accent-teal); }
+    .flip-teal .flip-back { border-top: 4px solid var(--accent-teal); background-color: var(--accent-teal-soft); }
+
+    .flip-hint {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--text-subtle);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .hero-quote {
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      font-weight: 700;
+      line-height: 1.3;
+      color: var(--text-main);
+    }
+
+    /* Semantic Data Tables */
+    table.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      background-color: var(--surface-card);
+      border: 1px solid var(--border-hairline);
+    }
+
+    table.data-table th,
+    table.data-table td {
+      padding: 0.65rem 0.85rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border-hairline);
+      vertical-align: top;
+    }
+
+    table.data-table th {
+      background-color: var(--bg-parchment);
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-main);
+    }
+
+    .clone-banner {
+      background-color: var(--bg-parchment);
+      border: 1px solid var(--border-hairline);
+      border-left: 4px solid var(--accent-navy);
+      border-radius: 8px;
+      padding: 0.9rem 1.1rem;
+      font-family: var(--font-mono);
+      font-size: 0.92rem;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .big-stat {
+      font-family: var(--font-display);
+      font-size: 2.2rem;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    @media (max-width: 900px) {
+      .grid-2, .grid-3, .grid-4 {
+        grid-template-columns: 1fr;
+      }
+      .slide {
+        padding: 1.2rem;
+      }
+    }
+
+    /* 16:9 Print Stylesheet */
+    @page {
+      size: 16in 9in;
+      margin: 0;
+    }
+
+    @media print {
+      *, *::before, *::after {
+        animation: none !important;
+        transition: none !important;
+      }
+      html, body {
+        height: auto;
+        overflow: visible;
+        padding: 0;
+        background: #FFFFFF;
+      }
+      .deck-header, .deck-footer, .progress-rail {
+        display: none !important;
+      }
+      .keynote-stage {
+        width: 100% !important;
+        aspect-ratio: auto;
+        border: none;
+        box-shadow: none;
+        overflow: visible;
+      }
+      .slides-viewport {
+        overflow: visible;
+      }
+      .slide {
+        position: relative !important;
+        display: flex !important;
+        width: 16in !important;
+        height: 9in !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        page-break-after: always !important;
+        break-after: page !important;
+        background: #FFFFFF !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="deck-header" id="deck-header">
+    <span class="header-meta">DS212 · OBJECT-ORIENTED PROGRAMMING · USTP</span>
+    <span class="header-meta">PRESS [X] FLIP CARDS · [F] FULLSCREEN · [P] PRINT</span>
+  </header>
+
+  <main class="keynote-stage" id="keynote-stage">
+    <div class="progress-rail" aria-hidden="true">
+      <div class="progress-fill" id="progress-fill"></div>
+    </div>
+
+    <div class="sr-only" aria-live="polite" id="slide-announcer">Slide 1 of 12</div>
+
+    <div class="slides-viewport">
+
+      <!-- SLIDE 01: COVER -->
+      <section class="slide active" data-title="Cover">
+        <div class="slide-top">
+          <div>
+            <span class="kicker">DS212 · PEER TUTORING SESSION · MODULE 04</span>
+            <h1 class="hero-title">Encapsulation, Inheritance, and Polymorphism</h1>
+          </div>
+          <span class="slide-tag">60-MIN SPRINT</span>
+        </div>
+
+        <div class="slide-body">
+          <p class="lead-text">
+            A focused technical walkthrough of Python's three core object-oriented design mechanisms—from protecting internal state and reusing hierarchies to function, operator, and duck-typed polymorphism—followed by a team coding sprint.
+          </p>
+
+          <div class="grid-3">
+            <div class="panel panel-crimson">
+              <span class="panel-kicker c-crimson">PILLAR 01 · 30 PTS</span>
+              <div class="panel-title">Encapsulation</div>
+              <p class="lead-text" style="font-size:0.86rem;">Visibility conventions, <code class="inline">@property</code> validation, and defensive copies.</p>
+            </div>
+            <div class="panel panel-ochre">
+              <span class="panel-kicker c-ochre">PILLAR 02 · 35 PTS</span>
+              <div class="panel-title">Inheritance</div>
+              <p class="lead-text" style="font-size:0.86rem;"><code class="inline">super().__init__()</code>, overriding vs. extending, MRO, and composition.</p>
+            </div>
+            <div class="panel panel-teal">
+              <span class="panel-kicker c-teal">PILLAR 03 · 35 PTS</span>
+              <div class="panel-title">Polymorphism</div>
+              <p class="lead-text" style="font-size:0.86rem;">Function, operator, subtype overriding, and duck typing.</p>
+            </div>
+          </div>
+
+          <div class="clone-banner">
+            <span>CLONE NOW: <strong>git clone https://github.com/Troge-dev/ds212-oop-competition.git</strong></span>
+            <button type="button" class="ctrl-btn" id="copy-clone-btn">[COPY CMD]</button>
+          </div>
+        </div>
+
+        <div class="slide-bottom">
+          <span>Rogelio Q. Mandamian III · BS Data Science · USTP CITC</span>
+          <span>Use Arrow Keys or Space to navigate</span>
+        </div>
+      </section>
+
+      <!-- SLIDE 02: BIG PICTURE FLIP CARDS -->
+      <section class="slide" data-title="The Three Pillars Together">
+        <div class="slide-top">
+          <div>
+            <span class="kicker">ARCHITECTURAL OVERVIEW</span>
+            <h2 class="slide-title">How the Three Concepts Work as One System</h2>
+          </div>
+          <span class="slide-tag">CLICK CARDS OR PRESS [X]</span>
+        </div>
+
+        <div class="slide-body">
+          <p class="lead-text">
+            These mechanisms are not isolated syntax rules to memorize separately. Click any card below to reveal the underlying design rule and failure mode.
+          </p>
+
+          <div class="grid-3">
+            <button type="button" class="flip-card flip-crimson" aria-pressed="false">
+              <div class="flip-inner">
+                <div class="flip-face flip-front">
+                  <div>
+                    <span class="panel-kicker c-crimson">PILLAR 01 · ENCAPSULATION</span>
+                    <p class="hero-quote" style="margin-top:0.6rem;">Protect the State</p>
+                  </div>
+                  <p style="font-size:0.88rem;color:var(--text-muted);">Who is allowed to read or modify an object's internal data?</p>
+                  <span class="flip-hint">[CLICK TO FLIP]</span>
+                </div>
+                <div class="flip-face flip-back">
+                  <div>
+                    <span class="panel-kicker c-crimson">MECHANISM &amp; RISK</span>
+                    <ul class="clean-list" style="margin-top:0.5rem;">
+                      <li>Tools: <code class="inline">_attr</code>, <code class="inline">__attr</code>, <code class="inline">@property</code>, <code class="inline">tuple()</code>.</li>
+                      <li>Enforces invariants before state changes happen.</li>
+                      <li><strong>If skipped:</strong> Callers set impossible values (like <code class="inline">hp = -500</code>) or mutate shared lists.</li>
+                    </ul>
+                  </div>
+                  <span class="flip-hint">[FRONT]</span>
+                </div>
+              </div>
+            </button>
+
+            <button type="button" class="flip-card flip-ochre" aria-pressed="false">
+              <div class="flip-inner">
+                <div class="flip-face flip-front">
+                  <div>
+                    <span class="panel-kicker c-ochre">PILLAR 02 · INHERITANCE</span>
+                    <p class="hero-quote" style="margin-top:0.6rem;">Reuse &amp; Specialize</p>
+                  </div>
+                  <p style="font-size:0.88rem;color:var(--text-muted);">Is this class a specialized kind of an existing class?</p>
+                  <span class="flip-hint">[CLICK TO FLIP]</span>
+                </div>
+                <div class="flip-face flip-back">
+                  <div>
+                    <span class="panel-kicker c-ochre">MECHANISM &amp; RISK</span>
+                    <ul class="clean-list" style="margin-top:0.5rem;">
+                      <li>Tools: <code class="inline">class Child(Parent)</code>, <code class="inline">super()</code>, overriding.</li>
+                      <li>Eliminates duplicated setup and shared logic.</li>
+                      <li><strong>If misused:</strong> Forcing <code class="inline">has-a</code> parts into deep <code class="inline">is-a</code> trees creates brittle coupling.</li>
+                    </ul>
+                  </div>
+                  <span class="flip-hint">[FRONT]</span>
+                </div>
+              </div>
+            </button>
+
+            <button type="button" class="flip-card flip-teal" aria-pressed="false">
+              <div class="flip-inner">
+                <div class="flip-face flip-front">
+                  <div>
+                    <span class="panel-kicker c-teal">PILLAR 03 · POLYMORPHISM</span>
+                    <p class="hero-quote" style="margin-top:0.6rem;">One Interface, Many Forms</p>
+                  </div>
+                  <p style="font-size:0.88rem;color:var(--text-muted);">Can one function, operator, or loop operate on many types?</p>
+                  <span class="flip-hint">[CLICK TO FLIP]</span>
+                </div>
+                <div class="flip-face flip-back">
+                  <div>
+                    <span class="panel-kicker c-teal">MECHANISM &amp; RISK</span>
+                    <ul class="clean-list" style="margin-top:0.5rem;">
+                      <li>4 forms: Function, Operator, Subtype, Duck Typing.</li>
+                      <li>Replaces <code class="inline">if isinstance(...)</code> chains with unified calls.</li>
+                      <li><strong>If skipped:</strong> Adding one new class forces edits across every loop in the codebase.</li>
+                    </ul>
+                  </div>
+                  <span class="flip-hint">[FRONT]</span>
+                </div>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <div class="slide-bottom">
+          <span>Aligned with DS212 Module 04 (06_CoreConcepts)</span>
+          <span>Interactive Cards: Click or [X]</span>
+        </div>
+      </section>
+
+      <!-- SLIDE 03: ENCAPSULATION IN DEPTH -->
+      <section class="slide" data-title="Encapsulation Visibility & Properties">
+        <div class="slide-top">
+          <div>
+            <span class="kicker kicker-crimson">PILLAR 01 · DEEP DIVE</span>
+            <h2 class="slide-title">Encapsulation: Visibility Tiers &amp; Name Mangling</h2>
+          </div>
+          <span class="slide-tag">ENCAPSULATION 1/2</span>
+        </div>
+
+        <div class="slide-body">
+          <p class="lead-text">
+            Python does not use <code class="inline">private</code> or <code class="inline">protected</code> keywords like Java or C++. Instead, it combines naming conventions, compiler name mangling, and <code class="inline">@property</code> descriptors.
+          </p>
+
+          <table class="data-table">
+            <caption>Python Attribute Visibility Levels</caption>
+            <thead>
+              <tr>
+                <th scope="col">Syntax</th>
+                <th scope="col">Visibility Level</th>
+                <th scope="col">Python Runtime Behavior</th>
+                <th scope="col">When to Use in DS212</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code class="inline">self.name</code></td>
+                <td><strong>Public</strong></td>
+                <td>Accessible and writable directly from anywhere.</td>
+                <td>Simple, unvalidated data or public <code class="inline">@property</code> interfaces.</td>
+              </tr>
+              <tr>
+                <td><code class="inline">self._hp</code></td>
+                <td><strong>Protected (Convention)</strong></td>
+                <td>Accessible if forced, but signals internal ownership ("do not touch directly").</td>
+                <td>Backing storage behind <code class="inline">@property</code> getters and setters.</td>
+              </tr>
+              <tr>
+                <td><code class="inline">self.__pin</code></td>
+                <td><strong>Private (Name Mangled)</strong></td>
+                <td>Python rewrites the name internally to <code class="inline">_ClassName__pin</code> to prevent accidental collisions in subclasses.</td>
+                <td>Internal invariants that subclasses must never accidentally overwrite.</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="panel panel-crimson">
+            <span class="panel-kicker c-crimson">KEY INSIGHT · THE PYTHONIC WAY</span>
+            <p style="font-size:0.88rem;color:var(--text-muted);">
+              Expose clean attribute syntax (<code class="inline">station.threshold = 120</code>) backed by <code class="inline">@property</code> and <code class="inline">@threshold.setter</code>. Callers get simple syntax, while your class silently enforces validation rules.
+            </p>
+          </div>
+        </div>
+
+        <div class="slide-bottom">
+          <span>Encapsulation protects invariants at write-time and read-time</span>
+          <span>DS212 Standard: _protected + @property</span>
+        </div>
+      </section>
+
+      <!-- SLIDE 04: ENCAPSULATION CODE & DEFENSIVE COPIES -->
+      <section class="slide" data-title="Encapsulation Validation & Defensive Copies">
+        <div class="slide-top">
+          <div>
+            <span class="kicker kicker-crimson">PILLAR 01 · CODE ANATOMY</span>
+            <h2 class="slide-title">Enforcing Invariants &amp; Preventing Mutable Leaks</h2>
+          </div>
+          <span class="slide-tag">ENCAPSULATION 2/2</span>
+        </div>
+
+        <div class="slide-body">
+          <div class="grid-2">
+            <div class="panel panel-white">
+              <span class="panel-kicker c-crimson">BROKEN DESIGN (LEAKY STATE)</span>
+              <pre class="code-block"><span class="kw">class</span> <span class="fn">WeatherStation</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, threshold):
+        self.threshold = threshold
+        self.readings = []
+
+s = WeatherStation(-999)      <span class="cm"># Corrupt state allowed</span>
+s.readings.append(<span class="str">"bad_data"</span>) <span class="cm"># Bypassed validation!</span></pre>
+              <p style="font-size:0.85rem;color:var(--text-muted);">
+                Even if you add a <code class="inline">record()</code> method, returning the raw <code class="inline">self._readings</code> list still lets callers run <code class="inline">.append()</code> or <code class="inline">.clear()</code> from outside!
+              </p>
+            </div>
+
+            <div class="panel panel-teal">
+              <span class="panel-kicker c-teal">ENCAPSULATED DESIGN (DEFENSIVE)</span>
+              <pre class="code-block"><span class="kw">class</span> <span class="fn">WeatherStation</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, threshold):
+        self.threshold = threshold  <span class="cm"># Calls setter!</span>
+        self._readings = []
+
+    @property
+    <span class="kw">def</span> <span class="fn">readings</span>(self):
+        <span class="kw">return</span> tuple(self._readings) <span class="cm"># Read-only copy</span>
+
+    @property
+    <span class="kw">def</span> <span class="fn">threshold</span>(self):
+        <span class="kw">return</span> self._threshold
+
+    @threshold.setter
+    <span class="kw">def</span> <span class="fn">threshold</span>(self, val):
+        <span class="kw">if not</span> (0 &lt;= val &lt;= 500):
+            <span class="kw">raise</span> ValueError(<span class="str">"Out of range"</span>)
+        self._threshold = val</pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="slide-bottom">
+          <span>Task 1 Tip: Always return tuple(self._list) for read-only collection properties</span>
+          <span>Validation belongs inside __init__ and setters</span>
+        </div>
+      </section>
+
+      <!-- SLIDE 05: INHERITANCE DEEP DIVE -->
+      <section class="slide" data-title="Inheritance, super(), Override vs Extend">
+        <div class="slide-top">
+          <div>
+            <span class="kicker kicker-ochre">PILLAR 02 · DEEP DIVE</span>
+            <h2 class="slide-title">Inheritance: Reusing State with <code class="inline">super()</code></h2>
+          </div>
+          <span class="slide-tag">INHERITANCE 1/2</span>
+        </div>
+
+        <div class="slide-body">
+          <div class="grid-2">
+            <div class="panel panel-ochre">
+              <span class="panel-kicker c-ochre">THREE SUBCLASS ACTIONS</span>
+              <ul class="clean-list">
+                <li><strong>1. Inherit:</strong> Use a parent method untouched (e.g., <code class="inline">Warrior</code> inherits <code class="inline">take_damage()</code> and <code class="inline">.hp</code> for free).</li>
+                <li><strong>2. Override:</strong> Redefine a method completely to specialize math or rules (e.g., <code class="inline">Mage.attack()</code> uses <code class="inline">spell_power * 2</code>).</li>
+                <li><strong>3. Extend:</strong> Call <code class="inline">super().method()</code> inside the child method to reuse parent logic and add extra behavior.</li>
+              </ul>
+              <div class="panel panel-white" style="margin-top:0.5rem;">
+                <span class="panel-kicker c-crimson">CRITICAL RULE</span>
+                <p style="font-size:0.84rem;color:var(--text-muted);">
+                  If a subclass defines <code class="inline">__init__</code> without calling <code class="inline">super().__init__(...)</code>, none of the parent's attributes (<code class="inline">_name</code>, <code class="inline">_hp</code>) are created—causing <code class="inline">AttributeError</code>!
+                </p>
+              </div>
+            </div>
+
+            <div class="panel panel-white">
+              <span class="panel-kicker c-navy">OVERRIDE + EXTEND EXAMPLE</span>
+              <pre class="code-block"><span class="kw">class</span> <span class="fn">OrderTicket</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, ticket_id, rate):
+        self._ticket_id = ticket_id
+        self._rate = rate
+
+    <span class="kw">def</span> <span class="fn">summary</span>(self):
+        <span class="kw">return</span> <span class="str">f"Ticket #{self._ticket_id}"</span>
+
+<span class="kw">class</span> <span class="fn">StudentOrder</span>(OrderTicket):
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, ticket_id, rate, campus_id):
+        <span class="fn">super</span>().__init__(ticket_id, rate)  <span class="cm"># Setup parent</span>
+        self.campus_id = campus_id
+
+    <span class="kw">def</span> <span class="fn">summary</span>(self):                   <span class="cm"># Extend</span>
+        base = <span class="fn">super</span>().summary()
+        <span class="kw">return</span> <span class="str">f"{base} | Student {self.campus_id}"</span></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="slide-bottom">
+          <span>Use issubclass(Child, Parent) for classes and isinstance(obj, Parent) for instances</span>
+          <span>Task 2 tests super().__init__(), overriding, and super().describe()</span>
+        </div>
+      </section>
+
+      <!-- SLIDE 06: INHERITANCE DESIGN TRAPS -->
+      <section class="slide" data-title="Inheritance Traps: Composition & MRO">
+        <div class="slide-top">
+          <div>
+            <span class="kicker kicker-ochre">PILLAR 02 · DESIGN DECISIONS</span>
+            <h2 class="slide-title">When NOT to Inherit: Composition &amp; MRO</h2>
+          </div>
+          <span class="slide-tag">INHERITANCE 2/2 · FLIP CARDS [X]</span>
+        </div>
+
+        <div class="slide-body">
+          <div class="grid-3">
+            <button type="button" class="flip-card flip-ochre" aria-pressed="false">
+              <div class="flip-inner">
+                <div class="flip-face flip-front">
+                  <div>
+                    <span class="panel-kicker c-ochre">DESIGN TEST</span>
+                    <p class="hero-quote" style="margin-top:0.5rem;">IS-A vs HAS-A</p>
+                  </div>
+                  <p style="font-size:0.86rem;color:var(--text-muted);">Should <code class="inline">DataPipeline</code> inherit from <code class="inline">ScaleStep</code>?</p>
+                  <span class="flip-hint">[CLICK TO FLIP]</span>
+                </div>
+                <div class="flip-face flip-back">
+                  <div>
+                    <span class="panel-kicker c-ochre">COMPOSITION WINS</span>
+                    <ul class="clean-list" style="margin-top:0.5rem;">
+                      <li><strong>IS-A (Inheritance):</strong> A <code class="inline">RainGauge</code> <em>is a</em> <code class="inline">WeatherStation</code>.</li>
+                      <li><strong>HAS-A (Composition):</strong> A <code class="inline">Pipeline</code> <em>has a list of</em> <code class="inline">Steps</code>.</li>
+                      <li>Composition lets you swap steps at runtime without class explosion.</li>
+                    </ul>
+                  </div>
+                  <span class="flip-hint">[FRONT]</span>
+                </div>
+              </div>
+            </button>
+
+            <button type="button" class="flip-card flip-crimson" aria-pressed="false">
+              <div class="flip-inner">
+                <div class="flip-face flip-front">
+                  <div>
+                    <span class="panel-kicker c-crimson">MULTIPLE INHERITANCE</span>
+                    <p class="hero-quote" style="margin-top:0.5rem;">Method Resolution Order</p>
+                  </div>
+                  <p style="font-size:0.86rem;color:var(--text-muted);">If a class inherits from two parents, which method runs first?</p>
+                  <span class="flip-hint">[CLICK TO FLIP]</span>
+                </div>
+                <div class="flip-face flip-back">
+                  <div>
+                    <span class="panel-kicker c-crimson">C3 LINEARIZATION (__mro__)</span>
+                    <ul class="clean-list" style="margin-top:0.5rem;">
+                      <li>Python searches left-to-right, depth-first up to shared ancestors (<code class="inline">Class.__mro__</code>).</li>
+                      <li>Used with Mixins (e.g., <code class="inline">class Shuttle(GPSTrackableMixin, Vehicle)</code>).</li>
+                      <li>Always inspect <code class="inline">__mro__</code> when combining mixins!</li>
+                    </ul>
+                  </div>
+                  <span class="flip-hint">[FRONT]</span>
+                </div>
+              </div>
+            </button>
+
+            <button type="button" class="flip-card flip-teal" aria-pressed="false">
+              <div class="flip-inner">
+                <div class="flip-face flip-front">
+                  <div>
+                    <span class="panel-kicker c-teal">ABSTRACT CONTRACTS</span>
+                    <p class="hero-quote" style="margin-top:0.5rem;">ABC &amp; @abstractmethod</p>
+                  </div>
+                  <p style="font-size:0.86rem;color:var(--text-muted);">How do you forbid instantiating a generic base template directly?</p>
+                  <span class="flip-hint">[CLICK TO FLIP]</span>
+                </div>
+                <div class="flip-face flip-back">
+                  <div>
+                    <span class="panel-kicker c-teal">ENFORCING INTERFACES</span>
+                    <ul class="clean-list" style="margin-top:0.5rem;">
+                      <li>Inherit from <code class="inline">abc.ABC</code> and decorate methods with <code class="inline">@abstractmethod</code>.</li>
+                      <li>Python raises <code class="inline">TypeError</code> if a subclass forgets to implement the method.</li>
+                      <li>Or raise <code class="inline">NotImplementedError</code> in base defaults.</li>
+                    </ul>
+                  </div>
+                  <span class="flip-hint">[FRONT]</span>
+                </div>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <div class="slide-bottom">
+          <span>Prefer Composition for swappable behaviors; Inheritance for shared identity</span>
+          <span>Check Class.__mro__ in Python</span>
+        </div>
+      </section>
+
+      <!-- SLIDE 07: POLYMORPHISM OVERVIEW (4 TYPES) -->
+      <section class="slide" data-title="The Four Faces of Polymorphism">
+        <div class="slide-top">
+          <div>
+            <span class="kicker kicker-teal">PILLAR 03 · DEEP DIVE</span>
+            <h2 class="slide-title">Polymorphism: Four Mechanisms in Python</h2>
+          </div>
+          <span class="slide-tag">POLYMORPHISM 1/3</span>
+        </div>
+
+        <div class="slide-body">
+          <p class="lead-text">
+            Polymorphism means <em>"many forms"</em>—a single symbol, function, or interface behaving appropriately depending on the object it receives. In Python, polymorphism shows up in four distinct ways:
+          </p>
+
+          <div class="grid-4">
+            <div class="panel panel-navy">
+              <span class="panel-kicker c-navy">01 · FUNCTION POLYMORPHISM</span>
+              <div class="panel-title">One Function, Multiple Data Types</div>
+              <p style="font-size:0.85rem;color:var(--text-muted);">
+                Functions like <code class="inline">len(x)</code>, <code class="inline">sum(x)</code>, or <code class="inline">sorted(x)</code> accept strings, lists, tuples, dicts, or custom objects without separate <code class="inline">len_str()</code> / <code class="inline">len_list()</code> names.
+              </p>
+            </div>
+
+            <div class="panel panel-crimson">
+              <span class="panel-kicker c-crimson">02 · OPERATOR POLYMORPHISM</span>
+              <div class="panel-title">Operator Overloading (+, *, ==)</div>
+              <p style="font-size:0.85rem;color:var(--text-muted);">
+                Built-in operators adapt to their operands (<code class="inline">+</code> adds integers, concatenates strings, joins lists) and can be customized via dunder methods like <code class="inline">__add__</code>.
+              </p>
+            </div>
+
+            <div class="panel panel-ochre">
+              <span class="panel-kicker c-ochre">03 · SUBTYPE POLYMORPHISM</span>
+              <div class="panel-title">Inheritance + Method Overriding</div>
+              <p style="font-size:0.85rem;color:var(--text-muted);">
+                Subclasses share a parent interface (<code class="inline">attack()</code>, <code class="inline">late_fee()</code>) so a loop processes mixed objects uniformly without checking concrete types.
+              </p>
+            </div>
+
+            <div class="panel panel-teal">
+              <span class="panel-kicker c-teal">04 · DUCK TYPING</span>
+              <div class="panel-title">Behavior Over Hierarchy</div>
+              <p style="font-size:0.85rem;color:var(--text-muted);">
+                <em>"If it walks like a duck and quacks like a duck..."</em> Unrelated classes work together seamlessly as long as they implement the expected method name.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="slide-bottom">
+          <span>Polymorphism decouples caller loops from concrete class implementations</span>
+          <span>Next: Function &amp; Operator Polymorphism in Code</span>
+        </div>
+      </section>
+
+      <!-- SLIDE 08: FUNCTION & OPERATOR POLYMORPHISM -->
+      <section class="slide" data-title="Function & Operator Polymorphism">
+        <div class="slide-top">
+          <div>
+            <span class="kicker kicker-teal">PILLAR 03 · MECHANICS</span>
+            <h2 class="slide-title">Function Polymorphism &amp; Operator Overloading</h2>
+          </div>
+          <span class="slide-tag">POLYMORPHISM 2/3</span>
+        </div>
+
+        <div class="slide-body">
+          <div class="grid-2">
+            <div class="panel panel-navy">
+              <span class="panel-kicker c-navy">FUNCTION POLYMORPHISM (BUILT-IN &amp; CUSTOM)</span>
+              <pre class="code-block"><span class="cm"># Same function len() works on completely different types</span>
+print(len(<span class="str">"DS212"</span>))          <span class="cm"># 5 (characters)</span>
+print(len([10, 20, 30]))     <span class="cm"># 3 (list items)</span>
+print(len({<span class="str">"a"</span>: 1, <span class="str">"b"</span>: 2})) <span class="cm"># 2 (dict keys)</span>
+
+<span class="cm"># Under the hood, len(obj) calls obj.__len__()!</span>
+<span class="kw">class</span> <span class="fn">Playlist</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, tracks):
+        self.tracks = list(tracks)
+    <span class="kw">def</span> <span class="fn">__len__</span>(self):
+        <span class="kw">return</span> len(self.tracks)
+
+p = Playlist([<span class="str">"Intro"</span>, <span class="str">"Lab"</span>])
+print(len(p))                <span class="cm"># 2 (works with len()!)</span></pre>
+              <p style="font-size:0.83rem;color:var(--text-muted);">
+                Also note: Python allows type-based dispatch via <code class="inline">@functools.singledispatch</code> when different data types need distinct algorithms under one function name.
+              </p>
+            </div>
+
+            <div class="panel panel-crimson">
+              <span class="panel-kicker c-crimson">OPERATOR POLYMORPHISM (OVERLOADING)</span>
+              <pre class="code-block"><span class="cm"># Same '+' operator, three different behaviors:</span>
+print(10 + 5)                <span class="cm"># 15 (int addition)</span>
+print(<span class="str">"Data"</span> + <span class="str">"Science"</span>)    <span class="cm"># "DataScience" (concat)</span>
+print([1, 2] + [3, 4])       <span class="cm"># [1, 2, 3, 4] (merge)</span>
+
+<span class="cm"># Custom Operator Overloading with __add__:</span>
+<span class="kw">class</span> <span class="fn">Vector2D</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, x, y):
+        self.x, self.y = x, y
+    <span class="kw">def</span> <span class="fn">__add__</span>(self, other):
+        <span class="kw">return</span> Vector2D(self.x + other.x, self.y + other.y)
+    <span class="kw">def</span> <span class="fn">__repr__</span>(self):
+        <span class="kw">return</span> <span class="str">f"Vector2D({self.x}, {self.y})"</span>
+
+v = Vector2D(2, 3) + Vector2D(4, 1)  <span class="cm"># Vector2D(6, 4)</span></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="slide-bottom">
+          <span>Preview of Module 06 (08_SpecialMethods): __len__, __add__, __eq__, __repr__</span>
+          <span>Dunder methods power Python's operator &amp; function polymorphism</span>
+        </div>
+      </section>
+
+      <!-- SLIDE 09: SUBTYPE POLYMORPHISM & DUCK TYPING -->
+      <section class="slide" data-title="Subtype Polymorphism vs Duck Typing">
+        <div class="slide-top">
+          <div>
+            <span class="kicker kicker-teal">PILLAR 03 · REFACTORING PATTERN</span>
+            <h2 class="slide-title">Eliminating <code class="inline">isinstance()</code> with Duck Typing</h2>
+          </div>
+          <span class="slide-tag">POLYMORPHISM 3/3</span>
+        </div>
+
+        <div class="slide-body">
+          <div class="grid-2">
+            <div class="panel panel-white">
+              <span class="panel-kicker c-crimson">ANTI-PATTERN (FRAGILE TYPE CHECKING)</span>
+              <pre class="code-block"><span class="kw">def</span> <span class="fn">run_battle_round</span>(units, target):
+    total = 0
+    <span class="kw">for</span> u <span class="kw">in</span> units:
+        <span class="kw">if</span> isinstance(u, Warrior):
+            total += u.attack(target)
+        <span class="kw">elif</span> isinstance(u, Mage):
+            total += u.attack(target)
+        <span class="cm"># TrapTurret silently skipped!</span>
+    <span class="kw">return</span> total</pre>
+              <ul class="clean-list" style="margin-top:0.4rem;">
+                <li>Every time a new class is introduced, you must hunt down and edit every <code class="inline">if/elif</code> branch.</li>
+                <li>Breaks open-closed design and rejects valid duck-typed objects.</li>
+              </ul>
+            </div>
+
+            <div class="panel panel-teal">
+              <span class="panel-kicker c-teal">CLEAN POLYMORPHISM + DUCK TYPING</span>
+              <pre class="code-block"><span class="kw">class</span> <span class="fn">TrapTurret</span>:  <span class="cm"># Does NOT inherit Fighter!</span>
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, damage):
+        self.damage = damage
+    <span class="kw">def</span> <span class="fn">attack</span>(self, target):
+        target.take_damage(self.damage)
+        <span class="kw">return</span> self.damage
+
+<span class="kw">def</span> <span class="fn">run_battle_round</span>(units, target):
+    <span class="cm"># Works for Warrior, Mage, AND TrapTurret!</span>
+    <span class="kw">return</span> sum(u.attack(target) <span class="kw">for</span> u <span class="kw">in</span> units)</pre>
+              <ul class="clean-list" style="margin-top:0.4rem;">
+                <li>Zero <code class="inline">isinstance()</code> checks.</li>
+                <li>Future classes work automatically as long as they provide <code class="inline">.attack(target)</code>.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="slide-bottom">
+          <span>Task 3 Warning: Your runner function is inspected to ensure zero isinstance() calls</span>
+          <span>Duck typing relies on shared method contract, not shared parent</span>
+        </div>
+      </section>
+
+      <!-- SLIDE 10: GRAND SYNTHESIS MATRIX -->
+      <section class="slide" data-title="Grand Synthesis Matrix">
+        <div class="slide-top">
+          <div>
+            <span class="kicker">EXECUTIVE DIAGNOSTIC RUBRIC</span>
+            <h2 class="slide-title">Quick-Reference Decision Matrix</h2>
+          </div>
+          <span class="slide-tag">SYNTHESIS</span>
+        </div>
+
+        <div class="slide-body">
+          <table class="data-table">
+            <caption>DS212 OOP Diagnostic Reference</caption>
+            <thead>
+              <tr>
+                <th scope="col">Concept</th>
+                <th scope="col">Symptom / Problem You Have</th>
+                <th scope="col">Python Tool / Pattern</th>
+                <th scope="col">Classic Trap to Avoid</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong class="c-crimson">Encapsulation</strong></td>
+                <td>Callers insert invalid values or mutate internal lists directly.</td>
+                <td><code class="inline">_attr</code>, <code class="inline">@property</code> + setter raising <code class="inline">ValueError</code>, return <code class="inline">tuple()</code>.</td>
+                <td>Validating only in <code class="inline">__init__</code> or returning raw mutable <code class="inline">list</code>.</td>
+              </tr>
+              <tr>
+                <td><strong class="c-ochre">Inheritance</strong></td>
+                <td>Multiple classes share 80% of the same attributes and logic.</td>
+                <td><code class="inline">class Child(Parent)</code>, <code class="inline">super().__init__()</code>, <code class="inline">super().method()</code>.</td>
+                <td>Forgetting <code class="inline">super().__init__()</code> or inheriting for <code class="inline">has-a</code> parts.</td>
+              </tr>
+              <tr>
+                <td><strong class="c-navy">Func / Op Polymorphism</strong></td>
+                <td>Need built-ins (<code class="inline">len</code>) or math (<code class="inline">+</code>, <code class="inline">==</code>) on custom objects.</td>
+                <td>Special dunder methods (<code class="inline">__len__</code>, <code class="inline">__add__</code>, <code class="inline">__repr__</code>).</td>
+                <td>Mutating <code class="inline">self</code> inside <code class="inline">__add__</code> instead of returning a new object.</td>
+              </tr>
+              <tr>
+                <td><strong class="c-teal">Subtype &amp; Duck Typing</strong></td>
+                <td>Functions use ugly <code class="inline">if isinstance(...)</code> chains to pick behavior.</td>
+                <td>Shared method contract + unified <code class="inline">for obj in items: obj.action()</code>.</td>
+                <td>Hardcoding type checks that break when unrelated classes conform to the interface.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="slide-bottom">
+          <span>Keep this table handy during Weeks 5-8 Practical Workshops and Portfolio 1</span>
+          <span>Ready for the Group Coding Sprint</span>
+        </div>
+      </section>
+
+      <!-- SLIDE 11: COMPETITION ASSIGNMENTS -->
+      <section class="slide" data-title="Group Competition Briefing">
+        <div class="slide-top">
+          <div>
+            <span class="kicker">NEXT 35 MINUTES · LAB COMPETITION</span>
+            <h2 class="slide-title">Five Parallel Challenges · Same 100-Point Standard</h2>
+          </div>
+          <span class="slide-tag">GROUP SPRINT</span>
+        </div>
+
+        <div class="slide-body">
+          <p class="lead-text">
+            Every group solves <strong>all three concepts</strong> (Task 1: 30 pts · Task 2: 35 pts · Task 3: 35 pts) wrapped in a unique theme. Run each verification cell (<code class="inline">Shift + Enter</code>) until your scoreboard reads <code class="inline">100 / 100</code>.
+          </p>
+
+          <table class="data-table">
+            <caption>Group Notebook Assignments</caption>
+            <thead>
+              <tr>
+                <th scope="col">Group</th>
+                <th scope="col">Notebook File</th>
+                <th scope="col">Theme &amp; Classes</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Group 1</strong></td>
+                <td><code class="inline">group_1_battle_arena.ipynb</code></td>
+                <td>Turn-Based RPG Combat: <code class="inline">Fighter</code>, <code class="inline">Warrior</code>, <code class="inline">Mage</code>, <code class="inline">TrapTurret</code></td>
+              </tr>
+              <tr>
+                <td><strong>Group 2</strong></td>
+                <td><code class="inline">group_2_flood_dispatch.ipynb</code></td>
+                <td>CDO Flood Dispatch: <code class="inline">WeatherStation</code>, <code class="inline">RainGauge</code>, <code class="inline">RiverSensor</code>, <code class="inline">CitizenSMSReport</code></td>
+              </tr>
+              <tr>
+                <td><strong>Group 3</strong></td>
+                <td><code class="inline">group_3_campus_pos.ipynb</code></td>
+                <td>Campus Coffee POS: <code class="inline">OrderTicket</code>, <code class="inline">StudentOrder</code>, <code class="inline">BulkOrder</code>, <code class="inline">PromoVoucher</code></td>
+              </tr>
+              <tr>
+                <td><strong>Group 4</strong></td>
+                <td><code class="inline">group_4_library_system.ipynb</code></td>
+                <td>Digital Media Queue: <code class="inline">MediaItem</code>, <code class="inline">PrintedBook</code>, <code class="inline">AudioBook</code>, <code class="inline">LabEquipmentKit</code></td>
+              </tr>
+              <tr>
+                <td><strong>Group 5</strong></td>
+                <td><code class="inline">group_5_data_pipeline.ipynb</code></td>
+                <td>Mini Data Pipeline: <code class="inline">DatasetBatch</code>, <code class="inline">ScaleStep</code>, <code class="inline">ClampStep</code>, <code class="inline">DropNegativesStep</code></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="slide-bottom">
+          <span>Win Condition: Highest percentage of teammates in a group reaching 100 / 100</span>
+          <span>Help teammates near you—no copy-pasting across groups</span>
+        </div>
+      </section>
+
+      <!-- SLIDE 12: LAUNCH SLIDE -->
+      <section class="slide" data-title="Launch Sprint">
+        <div class="slide-top">
+          <div>
+            <span class="kicker">TIMER STARTS NOW</span>
+            <h2 class="slide-title">Open Your Notebook &amp; Start Debugging</h2>
+          </div>
+          <span class="slide-tag">35-MINUTE CLOCK</span>
+        </div>
+
+        <div class="slide-body">
+          <div class="clone-banner">
+            <span><strong>git clone https://github.com/Troge-dev/ds212-oop-competition.git</strong></span>
+            <span>Python 3 Standard Library Only</span>
+          </div>
+
+          <div class="grid-3">
+            <div class="panel panel-crimson">
+              <div class="big-stat c-crimson">30 pts</div>
+              <div class="panel-title">Task 1 · Encapsulation</div>
+              <p style="font-size:0.85rem;color:var(--text-muted);">Fix protected attributes, read-only properties, tuple collections, and <code class="inline">ValueError</code> validation.</p>
+            </div>
+            <div class="panel panel-ochre">
+              <div class="big-stat c-ochre">35 pts</div>
+              <div class="panel-title">Task 2 · Inheritance</div>
+              <p style="font-size:0.85rem;color:var(--text-muted);">Wire <code class="inline">super().__init__()</code>, override core methods, and extend descriptions via <code class="inline">super()</code>.</p>
+            </div>
+            <div class="panel panel-teal">
+              <div class="big-stat c-teal">35 pts</div>
+              <div class="panel-title">Task 3 · Polymorphism</div>
+              <p style="font-size:0.85rem;color:var(--text-muted);">Eliminate <code class="inline">isinstance()</code> branches and align the duck-typed class interface.</p>
+            </div>
+          </div>
+
+          <div class="panel panel-white">
+            <span class="panel-kicker c-navy">OFFICIAL COURSE REFERENCE</span>
+            <p style="font-size:0.88rem;color:var(--text-muted);">
+              Stuck on syntax? Review <code class="inline">00_quick_reviewer.ipynb</code> in your cloned folder or Sir Jhun Brian's DS212 guide:
+              <strong>https://jhunbrian.github.io/ims/oop/notebooks/06_CoreConcepts.html</strong>
+            </p>
+          </div>
+        </div>
+
+        <div class="slide-bottom">
+          <span>Debrief begins at minute 50 · Keep your Final Scoreboard output visible</span>
+          <span>DS212 · USTP CITC</span>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <nav class="deck-footer" id="deck-footer" aria-label="Slide navigation controls">
+    <button type="button" class="ctrl-btn" id="prev-btn" aria-label="Previous slide">[PREV]</button>
+    <span class="slide-counter" id="slide-counter">01 / 12</span>
+    <button type="button" class="ctrl-btn" id="next-btn" aria-label="Next slide">[NEXT]</button>
+    <button type="button" class="ctrl-btn" id="flip-all-btn" aria-label="Flip all cards on current slide">[FLIP ALL]</button>
+    <button type="button" class="ctrl-btn" id="fullscreen-btn" aria-label="Toggle fullscreen">[FULLSCREEN]</button>
+  </nav>
+
+  <script>
+    (function () {
+      const slides = Array.from(document.querySelectorAll(".slide"));
+      const total = slides.length;
+      let current = 0;
+
+      const prevBtn = document.getElementById("prev-btn");
+      const nextBtn = document.getElementById("next-btn");
+      const flipAllBtn = document.getElementById("flip-all-btn");
+      const fullscreenBtn = document.getElementById("fullscreen-btn");
+      const counterEl = document.getElementById("slide-counter");
+      const progressEl = document.getElementById("progress-fill");
+      const announcerEl = document.getElementById("slide-announcer");
+      const deckHeader = document.getElementById("deck-header");
+      const deckFooter = document.getElementById("deck-footer");
+      const copyCloneBtn = document.getElementById("copy-clone-btn");
+
+      function formatNum(n) {
+        return String(n).padStart(2, "0");
+      }
+
+      function resetFlipsOnSlide(slide) {
+        slide.querySelectorAll(".flip-card.is-flipped").forEach((card) => {
+          card.classList.remove("is-flipped");
+          card.setAttribute("aria-pressed", "false");
+        });
+      }
+
+      function showSlide(index) {
+        if (index < 0 || index >= total) return;
+        resetFlipsOnSlide(slides[current]);
+        slides[current].classList.remove("active");
+        current = index;
+        slides[current].classList.add("active");
+        slides[current].scrollTop = 0;
+
+        counterEl.textContent = formatNum(current + 1) + " / " + formatNum(total);
+        progressEl.style.width = (((current + 1) / total) * 100).toFixed(2) + "%";
+        prevBtn.disabled = current === 0;
+        nextBtn.disabled = current === total - 1;
+
+        const title = slides[current].getAttribute("data-title") || "";
+        announcerEl.textContent = "Slide " + (current + 1) + " of " + total + (title ? ": " + title : "");
+      }
+
+      function toggleCard(card) {
+        const flipped = card.classList.toggle("is-flipped");
+        card.setAttribute("aria-pressed", flipped ? "true" : "false");
+      }
+
+      function flipAllOnActiveSlide() {
+        const cards = slides[current].querySelectorAll(".flip-card");
+        if (!cards.length) return;
+        const anyUnflipped = Array.from(cards).some((c) => !c.classList.contains("is-flipped"));
+        cards.forEach((c) => {
+          c.classList.toggle("is-flipped", anyUnflipped);
+          c.setAttribute("aria-pressed", anyUnflipped ? "true" : "false");
+        });
+      }
+
+      function toggleFullscreen() {
+        if (!document.fullscreenElement) {
+          document.documentElement.requestFullscreen().catch(() => {});
+        } else {
+          document.exitFullscreen().catch(() => {});
+        }
+      }
+
+      document.querySelectorAll(".flip-card").forEach((card) => {
+        card.addEventListener("click", () => toggleCard(card));
+      });
+
+      prevBtn.addEventListener("click", () => showSlide(current - 1));
+      nextBtn.addEventListener("click", () => showSlide(current + 1));
+      flipAllBtn.addEventListener("click", flipAllOnActiveSlide);
+      fullscreenBtn.addEventListener("click", toggleFullscreen);
+
+      if (copyCloneBtn) {
+        copyCloneBtn.addEventListener("click", () => {
+          navigator.clipboard.writeText("git clone https://github.com/Troge-dev/ds212-oop-competition.git").then(() => {
+            copyCloneBtn.textContent = "[COPIED]";
+            setTimeout(() => { copyCloneBtn.textContent = "[COPY CMD]"; }, 1800);
+          }).catch(() => {});
+        });
+      }
+
+      document.addEventListener("keydown", (e) => {
+        if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
+
+        if (e.key === "ArrowRight" || e.key === "PageDown" || (e.key === " " && e.target.tagName !== "BUTTON")) {
+          e.preventDefault();
+          showSlide(current + 1);
+        } else if (e.key === "ArrowLeft" || e.key === "PageUp") {
+          e.preventDefault();
+          showSlide(current - 1);
+        } else if (e.key === "Home") {
+          e.preventDefault();
+          showSlide(0);
+        } else if (e.key === "End") {
+          e.preventDefault();
+          showSlide(total - 1);
+        } else if (e.key === "x" || e.key === "X") {
+          e.preventDefault();
+          flipAllOnActiveSlide();
+        } else if (e.key === "f" || e.key === "F") {
+          e.preventDefault();
+          toggleFullscreen();
+        } else if (e.key === "h" || e.key === "H") {
+          deckHeader.classList.toggle("pinned");
+        } else if (e.key === "c" || e.key === "C") {
+          deckFooter.classList.toggle("pinned");
+        } else if (e.key === "p" || e.key === "P") {
+          window.print();
+        } else if (e.key === "Escape") {
+          deckHeader.classList.remove("pinned");
+          deckFooter.classList.remove("pinned");
+        }
+      });
+
+      showSlide(0);
+    })();
+  </script>
+</body>
+</html>
